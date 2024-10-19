@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  myapp:
+    image: rssa_rag:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PYTHONUNBUFFERED=1
+      - INPUT_SOURCE=api # this will be changed to api in production
+      - API_KEY=${API_KEY}
+      - API_URL=${API_URL}
+      - PORT=8000
+      - LLM_PROVIDER=openai
+    
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: gunicorn --bind 0.0.0.0:80 --workers 4 src.main:app
+    ports:
+      - "8000:80"
+
+networks:
+  app_network:
+    driver: bridge
